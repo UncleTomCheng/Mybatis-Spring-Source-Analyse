@@ -1,0 +1,68 @@
+@startuml
+/'spring框架'/
+package spring-framework #yellow{
+    interface FactoryBean<SqlSessionFactory>{
+        T getObject() throws Exception
+        Class<?> getObjectType()
+        default boolean isSingleton() return true
+    }
+    hide FactoryBean fields
+    note right of FactoryBean:实现该接口的bean，通过\ngetBean()获取bean实例，\n本质上是获取具体实现类的\ngetObject()返回的实例
+    interface ApplicationListener<ApplicationEvent>
+    interface InitializingBean {
+        void afterPropertiesSet() throws Exception
+    }
+    hide InitializingBean fields
+    note right of InitializingBean:实现该接口的bean会在初始化时\n调用其afterPropertiesSet()来进行\nbean的逻辑初始化
+}
+/'mybatis-spring.jar'/
+package mybatis-spring.jar #pink{
+    class SqlSessionFactoryBean implements FactoryBean, InitializingBean, ApplicationListener{
+        - Configuration configuration
+        - Resource configLocation
+        - Properties configurationProperties
+        - DataSource dataSource
+        - SqlSessionFactoryBuilder sqlSessionFactoryBuilder = new SqlSessionFactoryBuilder()
+        - SqlSessionFactory sqlSessionFactory
+        - String typeAliasesPackage
+        - Class<?>[] typeAliases
+        - Interceptor[] plugins
+        - TypeHandler<?>[] typeHandlers
+        - DatabaseIdProvider databaseIdProvider
+        - ObjectFactory objectFactory
+        - ObjectWrapperFactory objectWrapperFactory
+        - Cache cache
+        - TransactionFactory transactionFactory
+        - Resource[] mapperLocations
+        - String environment = SqlSessionFactoryBean.class.getSimpleName()
+        # SqlSessionFactory buildSqlSessionFactory() throws IOException
+    }
+}
+
+/'mybatis框架'/
+package mybatis-3 #FEA{
+    class SqlSessionFactoryBuilder
+    interface SqlSessionFactory
+    class Configuration
+    interface DatabaseIdProvider {
+      + void setProperties(Properties p)
+      + String getDatabaseId(DataSource dataSource) throws SQLException
+    }
+    hide DatabaseIdProvider fields
+    abstract class BaseBuilder{
+        # final Configuration configuration;
+        # final TypeAliasRegistry typeAliasRegistry;
+        # final TypeHandlerRegistry typeHandlerRegistry
+        + Configuration getConfiguration()
+    }
+    class XMLConfigBuilder extends BaseBuilder
+    class DefaultSqlSessionFactory implements SqlSessionFactory{
+      - final Configuration configuration
+     }
+    SqlSessionFactoryBean *-- SqlSessionFactoryBuilder
+    SqlSessionFactoryBean *-- SqlSessionFactory
+    SqlSessionFactoryBean *-- Configuration
+    SqlSessionFactoryBean *-- DatabaseIdProvider
+}
+
+@enduml

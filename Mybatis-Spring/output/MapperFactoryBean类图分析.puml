@@ -1,0 +1,41 @@
+@startuml
+/'spring框架'/
+package "spring框架" #yellow{
+    interface FactoryBean<T>
+    interface InitializingBean{
+        + void afterPropertiesSet() throws Exception
+    }
+    hide InitializingBean fields
+    abstract class DaoSupport implements InitializingBean{
+        # abstract void checkDaoConfig() throws IllegalArgumentException
+        # void initDao() throws Exception
+    }
+}
+
+/'mybatis框架'/
+package "mybatis" #white{
+    interface SqlSession
+    interface DisposableBean
+}
+
+/'mybatis-spring.jar'/
+package "mybatis-spring.jar" #pink{
+    abstract class SqlSessionDaoSupport extends DaoSupport{
+         - SqlSessionTemplate sqlSessionTemplate
+    }
+    class MapperFactoryBean<T> extends SqlSessionDaoSupport implements FactoryBean{
+        -  Class<T> mapperInterface
+        -  boolean addToConfig = true
+    }
+    class SqlSessionTemplate implements SqlSession, DisposableBean {
+        - final SqlSessionFactory sqlSessionFactory;
+        - final ExecutorType executorType;
+        - final SqlSession sqlSessionProxy;
+        - final PersistenceExceptionTranslator exceptionTranslator
+    }
+    SqlSessionDaoSupport *-- SqlSessionTemplate
+}
+
+
+
+@enduml

@@ -1,0 +1,23 @@
+@startuml
+box "mybatis-spring.jar"
+    participant SqlSessionFactoryBean
+end box
+box "mybatis框架" #pink
+    participant Configuration
+    participant SqlSessionFactoryBuilder
+end box
+alt return this.sqlSessionFactory
+    SqlSessionFactoryBean->SqlSessionFactoryBean:SqlSessionFactory getObject()
+alt if (this.sqlSessionFactory == null)
+    SqlSessionFactoryBean->SqlSessionFactoryBean:afterPropertiesSet()
+    note left :该方法是对FactoryBean接口的具体实现，\n主要是完成对sqlSessionFactory的初始化
+alt
+    SqlSessionFactoryBean->SqlSessionFactoryBean:buildSqlSessionFactory()
+    SqlSessionFactoryBean->SqlSessionFactoryBuilder:build(targetConfiguration)
+    SqlSessionFactoryBean<--SqlSessionFactoryBuilder:new DefaultSqlSessionFactory(config)
+end
+    SqlSessionFactoryBean-->SqlSessionFactoryBean:this.sqlSessionFactory=new DefaultSqlSessionFactory(config)
+end
+     SqlSessionFactoryBean-->SqlSessionFactoryBean:return this.sqlSessionFactory
+end
+@enduml
